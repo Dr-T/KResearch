@@ -37,6 +37,8 @@ export const runDynamicConversationalPlanner = async (
             You are Agent ${nextPersona} (${nextPersona === 'Alpha' ? 'Strategist' : 'Tactician'}).
             Engage in a critical debate to decide the next research step. The goal is to formulate novel and effective search queries through collaboration.
 
+            请始终使用与用户输入相同的语言进行回复。如果用户用中文提问，请用中文回复；如果用户用英文提问，请用英文回复。
+
             **Overall Research Context:**
             *   User's Original Query: "${query}"
             *   Refined Research Goal (from user conversation): "${clarifiedContext}"

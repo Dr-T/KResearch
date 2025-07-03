@@ -17,6 +17,8 @@ export const clarifyQuery = async (
     const systemPrompt = `**YOUR ONLY JOB IS TO PRODUCE A SINGLE, RAW JSON OBJECT.**
 Do not write any other text. Your entire response must start with \`{\` and end with \`}\`. Do not use markdown fences like \`\`\`json.
 
+请始终使用与用户输入相同的语言进行回复。如果用户用中文提问，请用中文回复；如果用户用英文提问，请用英文回复。
+
 Your role is to ask clarifying questions to refine a user's research request. You will use Google Search to inform your questions.
 
 **CRITICAL RULES:**

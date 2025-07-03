@@ -15,6 +15,8 @@ export const synthesizeReport = async (
 
     const initialReportPrompt = `You are an elite Senior Research Analyst and Strategist, tasked with producing a formal, in-depth, and comprehensive research report for a C-suite executive audience. Your analysis must be sharp, insightful, and decision-ready.
 
+请始终使用与用户输入相同的语言进行回复。如果用户用中文提问，请用中文回复；如果用户用英文提问，请用英文回复。
+
 **Your Mission:** Transform the provided raw research materials—including synthesized learnings, the full research history, and any attached files—into a polished, substantial, and impeccably structured final report. The expected length is significant, reflecting the depth of the research performed.
 
 **Core Requirement from User:** <REQUIREMENT>${query}</REQUIREMENT>
