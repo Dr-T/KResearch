@@ -1,4 +1,4 @@
-import { ai } from './geminiClient';
+import { aiClient, PROVIDER } from './geminiClient';
 import { researchModeModels } from './models';
 import { parseJsonFromMarkdown } from './utils';
 import { ResearchUpdate, AgentPersona, ResearchMode, FileData } from '../types';
@@ -68,11 +68,27 @@ export const runDynamicConversationalPlanner = async (
         if (fileData) {
             parts.push({ inlineData: { mimeType: fileData.mimeType, data: fileData.data } });
         }
-        const response = await ai.models.generateContent({
-            model: researchModeModels[mode].planner,
-            contents: { parts },
-            config: { responseMimeType: "application/json", temperature: 0.7 }
-        });
+        let response;
+        if (PROVIDER === 'openai') {
+            // OpenAI 格式
+            response = await aiClient.chat.completions.create({
+                model: researchModeModels[mode].planner,
+                messages: [
+                    { role: 'system', content: 'You are an AI research planner.' },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7
+            });
+            // OpenAI 返回格式兼容
+            response = { text: response.choices[0].message.content };
+        } else {
+            // GoogleGenAI 格式
+            response = await aiClient.models.generateContent({
+                model: researchModeModels[mode].planner,
+                contents: { parts },
+                config: { responseMimeType: "application/json", temperature: 0.7 }
+            });
+        }
         checkSignal();
         const parsedResponse = parseJsonFromMarkdown(response.text) as PlannerTurn;
 

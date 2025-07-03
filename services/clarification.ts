@@ -1,5 +1,4 @@
-
-import { ai } from './geminiClient';
+import { aiClient, PROVIDER } from './geminiClient';
 import { clarificationModels } from './models';
 import { parseJsonFromMarkdown } from './utils';
 import { ResearchMode, FileData, ClarificationTurn } from '../types';
@@ -43,15 +42,28 @@ Your AI Response (this is the entire response, nothing else):
         return { role: turn.role, parts: parts };
     });
 
-    const response = await ai.models.generateContent({
-        model: clarificationModels[mode],
-        contents: contents,
-        config: { 
-            systemInstruction: systemPrompt, 
-            temperature: 0.5,
-            tools: [{ googleSearch: {} }] 
-        }
-    });
+    let response;
+    if (PROVIDER === 'openai') {
+        response = await aiClient.chat.completions.create({
+            model: clarificationModels[mode],
+            messages: [
+                { role: 'system', content: 'You are an AI clarification assistant.' },
+                { role: 'user', content: systemPrompt + '\n' + history.map(h => h.content).join('\n') }
+            ],
+            temperature: 0.5
+        });
+        response = { text: response.choices[0].message.content };
+    } else {
+        response = await aiClient.models.generateContent({
+            model: clarificationModels[mode],
+            contents: contents,
+            config: { 
+                systemInstruction: systemPrompt, 
+                temperature: 0.5,
+                tools: [{ googleSearch: {} }] 
+            }
+        });
+    }
 
     const parsedResponse = parseJsonFromMarkdown(response.text) as ClarificationResponse;
 

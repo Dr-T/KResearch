@@ -1,4 +1,4 @@
-import { ai } from './geminiClient';
+import { aiClient, PROVIDER } from './geminiClient';
 import { researchModeModels } from './models';
 import { ResearchUpdate, Citation, FinalResearchData, ResearchMode, FileData } from '../types';
 
@@ -74,11 +74,24 @@ You must generate a report that strictly adheres to the following structure and 
     if (fileData) {
         parts.push({ inlineData: { mimeType: fileData.mimeType, data: fileData.data } });
     }
-    const reportResponse = await ai.models.generateContent({
-        model: researchModeModels[mode].synthesizer,
-        contents: { parts },
-        config: { temperature: 0.5 }
-    });
+    let reportResponse;
+    if (PROVIDER === 'openai') {
+        reportResponse = await aiClient.chat.completions.create({
+            model: researchModeModels[mode].synthesizer,
+            messages: [
+                { role: 'system', content: 'You are an elite Senior Research Analyst and Strategist.' },
+                { role: 'user', content: initialReportPrompt }
+            ],
+            temperature: 0.5
+        });
+        reportResponse = { text: reportResponse.choices[0].message.content };
+    } else {
+        reportResponse = await aiClient.models.generateContent({
+            model: researchModeModels[mode].synthesizer,
+            contents: { parts },
+            config: { temperature: 0.5 }
+        });
+    }
     
     const reportText = reportResponse.text.trim();
     if (!reportText) {
