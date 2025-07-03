@@ -27,8 +27,11 @@ const App: React.FC = () => {
     clarification: ''
   });
   const mainstreamModels = [
-    'gpt-4o',
-    'gpt-3.5-turbo',
+    'gpt-4.1',
+    'gpt-4.1-mini',
+    'deepseek-chat',
+    'deepseek-reasoner',
+    'claude-3-7-sonnet-20250219',
     'gemini-2.5-pro',
     'gemini-2.5-flash',
     'gemini-2.5-flash-lite-preview-06-17'
