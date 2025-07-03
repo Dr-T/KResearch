@@ -9,7 +9,8 @@ export const runIterativeDeepResearch = async (
   signal: AbortSignal,
   mode: ResearchMode,
   clarifiedContext: string,
-  fileData: FileData | null
+  fileData: FileData | null,
+  customModels?: { planner?: string, searcher?: string, synthesizer?: string }
 ): Promise<FinalResearchData> => {
   console.log(`Starting DYNAMIC CONVERSATIONAL research for: ${query}`);
 
@@ -39,7 +40,7 @@ export const runIterativeDeepResearch = async (
     await new Promise(resolve => setTimeout(resolve, 1000));
     checkSignal();
     
-    const plan = await runDynamicConversationalPlanner(query, history, onPlannerUpdate, checkSignal, idCounter, mode, clarifiedContext, fileData);
+    const plan = await runDynamicConversationalPlanner(query, history, onPlannerUpdate, checkSignal, idCounter, mode, clarifiedContext, fileData, customModels);
     
     checkSignal();
 
@@ -60,7 +61,7 @@ export const runIterativeDeepResearch = async (
       
       checkSignal();
 
-      const searchPromises = searchQueries.map(q => executeSingleSearch(q, mode));
+      const searchPromises = searchQueries.map(q => executeSingleSearch(q, mode, customModels));
       const searchResults = await Promise.all(searchPromises);
       checkSignal();
       
@@ -79,7 +80,7 @@ export const runIterativeDeepResearch = async (
     }
   }
 
-  const finalReportData = await synthesizeReport(query, history, allCitations, mode, fileData);
+  const finalReportData = await synthesizeReport(query, history, allCitations, mode, fileData, customModels);
   const uniqueCitations = Array.from(new Map(allCitations.map(c => [c.url, c])).values());
 
   return { ...finalReportData, citations: uniqueCitations, researchTimeMs: 0 };

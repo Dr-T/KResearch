@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import GlassCard from './components/GlassCard';
 import LiquidButton from './components/LiquidButton';
@@ -21,6 +20,20 @@ const App: React.FC = () => {
 
   const [isLogVisible, setIsLogVisible] = useState<boolean>(true);
   
+  const [customModels, setCustomModels] = useState({
+    planner: '',
+    searcher: '',
+    synthesizer: '',
+    clarification: ''
+  });
+  const mainstreamModels = [
+    'gpt-4o',
+    'gpt-3.5-turbo',
+    'gemini-2.5-pro',
+    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite-preview-06-17'
+  ];
+
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -44,11 +57,12 @@ const App: React.FC = () => {
     }
   };
 
-  const modes: { id: ResearchMode, name: string, description: string }[] = [
-    { id: 'Balanced', name: 'Balanced', description: 'Optimal mix for quality and speed.' },
-    { id: 'DeepDive', name: 'Deep Dive', description: 'Highest quality using the most powerful models.' },
-    { id: 'Fast', name: 'Fast', description: 'Quick results with capable models.' },
-    { id: 'UltraFast', name: 'Ultra Fast', description: 'Lightning-fast results for quick checks.' },
+  const modes: { id: ResearchMode | 'Custom', name: string, description: string }[] = [
+    { id: 'Balanced', name: '均衡', description: '质量与速度的最佳平衡' },
+    { id: 'DeepDive', name: '深度', description: '最高质量，使用最强模型' },
+    { id: 'Fast', name: '快速', description: '快速获得结果' },
+    { id: 'UltraFast', name: '极速', description: '极速反馈，适合快速检查' },
+    { id: 'Custom', name: '自定义', description: '手动选择/输入各服务模型' }
   ];
 
   return (
@@ -65,11 +79,47 @@ const App: React.FC = () => {
 
         {appState === 'idle' && (
           <div className="animate-fade-in space-y-4">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {modes.map((m) => (
-                <button key={m.id} onClick={() => setMode(m.id)} className={`p-3 rounded-[10px] text-sm font-semibold transition-all duration-300 text-center border ${mode === m.id ? 'bg-glow-light/20 dark:bg-glow-dark/30 text-gray-900 dark:text-white shadow-md border-glow-light dark:border-glow-dark' : 'bg-glass-light/50 dark:bg-glass-dark/50 text-gray-600 dark:text-gray-400 hover:bg-black/5 dark:hover:bg-white/10 border-border-light dark:border-border-dark'}`} title={m.description}>{m.name}</button>
+                <button key={m.id} onClick={() => setMode(m.id as ResearchMode | 'Custom')} className={`p-3 rounded-[10px] text-sm font-semibold transition-all duration-300 text-center border ${mode === m.id ? 'bg-glow-light/20 dark:bg-glow-dark/30 text-gray-900 dark:text-white shadow-md border-glow-light dark:border-glow-dark' : 'bg-glass-light/50 dark:bg-glass-dark/50 text-gray-600 dark:text-gray-400 hover:bg-black/5 dark:hover:bg-white/10 border-border-light dark:border-border-dark'}`} title={m.description}>{m.name}</button>
               ))}
             </div>
+            {mode === 'Custom' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <label className="block mb-1 text-sm font-medium">Planner模型</label>
+                  <select className="w-full p-2 rounded border" value={customModels.planner} onChange={e => setCustomModels(v => ({ ...v, planner: e.target.value }))}>
+                    <option value="">请选择或自定义</option>
+                    {mainstreamModels.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                  <input className="w-full p-2 rounded border mt-1" placeholder="自定义模型名" value={customModels.planner} onChange={e => setCustomModels(v => ({ ...v, planner: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block mb-1 text-sm font-medium">Searcher模型</label>
+                  <select className="w-full p-2 rounded border" value={customModels.searcher} onChange={e => setCustomModels(v => ({ ...v, searcher: e.target.value }))}>
+                    <option value="">请选择或自定义</option>
+                    {mainstreamModels.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                  <input className="w-full p-2 rounded border mt-1" placeholder="自定义模型名" value={customModels.searcher} onChange={e => setCustomModels(v => ({ ...v, searcher: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block mb-1 text-sm font-medium">Synthesizer模型</label>
+                  <select className="w-full p-2 rounded border" value={customModels.synthesizer} onChange={e => setCustomModels(v => ({ ...v, synthesizer: e.target.value }))}>
+                    <option value="">请选择或自定义</option>
+                    {mainstreamModels.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                  <input className="w-full p-2 rounded border mt-1" placeholder="自定义模型名" value={customModels.synthesizer} onChange={e => setCustomModels(v => ({ ...v, synthesizer: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block mb-1 text-sm font-medium">Clarification模型</label>
+                  <select className="w-full p-2 rounded border" value={customModels.clarification} onChange={e => setCustomModels(v => ({ ...v, clarification: e.target.value }))}>
+                    <option value="">请选择或自定义</option>
+                    {mainstreamModels.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                  <input className="w-full p-2 rounded border mt-1" placeholder="自定义模型名" value={customModels.clarification} onChange={e => setCustomModels(v => ({ ...v, clarification: e.target.value }))} />
+                </div>
+              </div>
+            )}
             <div className="relative">
               <textarea value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={handleKeyDown} placeholder="What is the future of AI in healthcare? (You can also attach a file)" className="w-full h-32 p-4 pr-12 rounded-lg resize-none bg-black/10 dark:bg-black/20 border border-transparent focus:border-glow-light dark:focus:border-glow-dark focus:ring-2 focus:ring-glow-light/50 dark:focus:ring-glow-dark/50 focus:outline-none transition-all duration-300" disabled={appState !== 'idle'}/>
               <div className="absolute inset-y-0 right-0 flex items-end p-3">

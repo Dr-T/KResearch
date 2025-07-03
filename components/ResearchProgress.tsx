@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import Spinner from './Spinner';
 import { ResearchUpdate, AgentPersona } from '../types';
@@ -12,12 +11,12 @@ const getAgentInfo = (persona: AgentPersona) => {
     switch (persona) {
         case 'Alpha':
             return {
-                name: 'Agent Alpha',
+                name: 'Alpha智能体',
                 icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>,
             };
         case 'Beta':
             return {
-                name: 'Agent Beta',
+                name: 'Beta智能体',
                 icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>,
             };
     }
@@ -41,7 +40,7 @@ const TypeIcon = ({ type, persona }: { type: ResearchUpdate['type'], persona?: A
 };
 
 const ResearchProgress: React.FC<ResearchProgressProps> = ({ updates, isResearching }) => {
-  const headerText = isResearching ? "Researching..." : "Research Complete";
+  const headerText = isResearching ? "研究中..." : "研究完成";
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,13 +72,13 @@ const ResearchProgress: React.FC<ResearchProgressProps> = ({ updates, isResearch
                 <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                 {update.type === 'search' && Array.isArray(update.content) ? (
                     <div>
-                    <span className="font-semibold capitalize text-gray-800 dark:text-gray-200">Searching For:</span>
+                    <span className="font-semibold capitalize text-gray-800 dark:text-gray-200">搜索内容：</span>
                     <ul className="list-disc pl-5 mt-1 text-xs space-y-1">
                         {update.content.map((query, qIndex) => (
                             <li key={qIndex}>
                                 {query}
                                 {Array.isArray(update.source) && update.source[qIndex] && (
-                                    <a href={update.source[qIndex]} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 ml-1 hover:underline">(source)</a>
+                                    <a href={update.source[qIndex]} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 ml-1 hover:underline">（来源）</a>
                                 )}
                             </li>
                         ))}
@@ -87,7 +86,7 @@ const ResearchProgress: React.FC<ResearchProgressProps> = ({ updates, isResearch
                     </div>
                 ) : update.type === 'read' ? (
                     <div>
-                    <span className="font-semibold capitalize text-gray-800 dark:text-gray-200">Read & Synthesized</span>
+                    <span className="font-semibold capitalize text-gray-800 dark:text-gray-200">阅读与整合</span>
                     {Array.isArray(update.source) &&
                         <span className="text-xs text-gray-500 ml-1">({update.source.length} sources)</span>
                     }
@@ -98,7 +97,7 @@ const ResearchProgress: React.FC<ResearchProgressProps> = ({ updates, isResearch
                         {update.persona ? (
                              <span className={`font-semibold capitalize ${update.persona === 'Alpha' ? 'text-purple-500 dark:text-purple-400' : 'text-cyan-500 dark:text-cyan-400'}`}>{getAgentInfo(update.persona).name}:</span>
                         ) : (
-                             <span className="font-semibold capitalize text-gray-800 dark:text-gray-200">Thought:</span>
+                             <span className="font-semibold capitalize text-gray-800 dark:text-gray-200">思考：</span>
                         )}
                        
                         <span className="ml-1 italic">{String(update.content)}</span>

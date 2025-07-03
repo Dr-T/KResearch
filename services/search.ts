@@ -2,11 +2,12 @@ import { aiClient, PROVIDER } from './geminiClient';
 import { researchModeModels } from './models';
 import { Citation, ResearchMode } from '../types';
 
-export const executeSingleSearch = async (searchQuery: string, mode: ResearchMode): Promise<{ text: string, citations: Citation[] }> => {
+export const executeSingleSearch = async (searchQuery: string, mode: ResearchMode, customModels?: { searcher?: string }): Promise<{ text: string, citations: Citation[] }> => {
+    let modelName = customModels?.searcher || researchModeModels[mode].searcher;
     let response;
     if (PROVIDER === 'openai') {
         response = await aiClient.chat.completions.create({
-            model: researchModeModels[mode].searcher,
+            model: modelName,
             messages: [
                 { role: 'system', content: 'You are an AI search summarizer.' },
                 { role: 'user', content: `Concisely summarize key information for the query: "${searchQuery}"` }
@@ -16,7 +17,7 @@ export const executeSingleSearch = async (searchQuery: string, mode: ResearchMod
         response = { text: response.choices[0].message.content };
     } else {
         response = await aiClient.models.generateContent({
-            model: researchModeModels[mode].searcher,
+            model: modelName,
             contents: `Concisely summarize key information for the query: "${searchQuery}"`,
             config: { tools: [{ googleSearch: {} }] },
         });

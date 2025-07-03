@@ -7,7 +7,8 @@ export const synthesizeReport = async (
     history: ResearchUpdate[],
     citations: Citation[],
     mode: ResearchMode,
-    fileData: FileData | null
+    fileData: FileData | null,
+    customModels?: { synthesizer?: string }
 ): Promise<Omit<FinalResearchData, 'researchTimeMs'>> => {
     const learnings = history.filter(h => h.type === 'read').map(h => h.content).join('\n\n---\n\n');
     const historyText = history.map(h => `${h.persona ? h.persona + ' ' : ''}${h.type}: ${Array.isArray(h.content) ? h.content.join(' | ') : h.content}`).join('\n');
@@ -74,10 +75,11 @@ You must generate a report that strictly adheres to the following structure and 
     if (fileData) {
         parts.push({ inlineData: { mimeType: fileData.mimeType, data: fileData.data } });
     }
+    let modelName = customModels?.synthesizer || researchModeModels[mode].synthesizer;
     let reportResponse;
     if (PROVIDER === 'openai') {
         reportResponse = await aiClient.chat.completions.create({
-            model: researchModeModels[mode].synthesizer,
+            model: modelName,
             messages: [
                 { role: 'system', content: 'You are an elite Senior Research Analyst and Strategist.' },
                 { role: 'user', content: initialReportPrompt }
@@ -87,7 +89,7 @@ You must generate a report that strictly adheres to the following structure and 
         reportResponse = { text: reportResponse.choices[0].message.content };
     } else {
         reportResponse = await aiClient.models.generateContent({
-            model: researchModeModels[mode].synthesizer,
+            model: modelName,
             contents: { parts },
             config: { temperature: 0.5 }
         });

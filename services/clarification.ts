@@ -11,7 +11,8 @@ export interface ClarificationResponse {
 export const clarifyQuery = async (
     history: ClarificationTurn[],
     mode: ResearchMode,
-    fileData: FileData | null
+    fileData: FileData | null,
+    customModels?: { clarification?: string }
 ): Promise<ClarificationResponse> => {
     const systemPrompt = `**YOUR ONLY JOB IS TO PRODUCE A SINGLE, RAW JSON OBJECT.**
 Do not write any other text. Your entire response must start with \`{\` and end with \`}\`. Do not use markdown fences like \`\`\`json.
@@ -42,10 +43,11 @@ Your AI Response (this is the entire response, nothing else):
         return { role: turn.role, parts: parts };
     });
 
+    let modelName = customModels?.clarification || clarificationModels[mode];
     let response;
     if (PROVIDER === 'openai') {
         response = await aiClient.chat.completions.create({
-            model: clarificationModels[mode],
+            model: modelName,
             messages: [
                 { role: 'system', content: 'You are an AI clarification assistant.' },
                 { role: 'user', content: systemPrompt + '\n' + history.map(h => h.content).join('\n') }
@@ -55,7 +57,7 @@ Your AI Response (this is the entire response, nothing else):
         response = { text: response.choices[0].message.content };
     } else {
         response = await aiClient.models.generateContent({
-            model: clarificationModels[mode],
+            model: modelName,
             contents: contents,
             config: { 
                 systemInstruction: systemPrompt, 

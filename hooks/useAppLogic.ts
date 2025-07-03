@@ -12,6 +12,12 @@ export const useAppLogic = () => {
     const [clarificationHistory, setClarificationHistory] = useState<ClarificationTurn[]>([]);
     const [clarificationLoading, setClarificationLoading] = useState<boolean>(false);
     const [clarifiedContext, setClarifiedContext] = useState<string>('');
+    const [customModels, setCustomModels] = useState({
+      planner: '',
+      searcher: '',
+      synthesizer: '',
+      clarification: ''
+    });
 
     const abortControllerRef = useRef<AbortController | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -19,7 +25,7 @@ export const useAppLogic = () => {
     const handleClarificationResponse = useCallback(async (history: ClarificationTurn[]) => {
       setClarificationLoading(true);
       try {
-          const response = await clarifyQuery(history, mode, selectedFile);
+          const response = await clarifyQuery(history, mode, selectedFile, mode === 'Custom' ? customModels : undefined);
           if (response.type === 'question') {
               setClarificationHistory(prev => [...prev, { role: 'model', content: response.content }]);
           } else if (response.type === 'summary') {
@@ -33,7 +39,7 @@ export const useAppLogic = () => {
       } finally {
           setClarificationLoading(false);
       }
-    }, [mode, selectedFile]);
+    }, [mode, selectedFile, customModels]);
 
     const startResearch = useCallback(async (context: string) => {
       abortControllerRef.current = new AbortController();
@@ -41,7 +47,7 @@ export const useAppLogic = () => {
       try {
         const result = await runIterativeDeepResearch(query, (update) => {
           setResearchUpdates(prev => [...prev, update]);
-        }, abortControllerRef.current.signal, mode, context, selectedFile);
+        }, abortControllerRef.current.signal, mode, context, selectedFile, mode === 'Custom' ? customModels : undefined);
         setFinalData({ ...result, researchTimeMs: Date.now() - startTime });
       } catch (error: any) {
         const commonErrorData = { citations: [], researchTimeMs: Date.now() - startTime };
@@ -54,7 +60,7 @@ export const useAppLogic = () => {
       } finally {
         setAppState('complete');
       }
-    }, [query, mode, selectedFile]);
+    }, [query, mode, selectedFile, customModels]);
 
     useEffect(() => {
       if (appState === 'researching' && clarifiedContext) {
@@ -112,6 +118,7 @@ export const useAppLogic = () => {
         query, setQuery, selectedFile, researchUpdates, setResearchUpdates, finalData, setFinalData, mode, setMode,
         appState, setAppState, clarificationHistory, clarificationLoading, clarifiedContext, abortControllerRef,
         fileInputRef, handleClarificationResponse, startResearch, startClarificationProcess, handleAnswerSubmit,
-        handleStopResearch, handleFileChange, handleRemoveFile, handleReset
+        handleStopResearch, handleFileChange, handleRemoveFile, handleReset,
+        customModels, setCustomModels
     };
 };

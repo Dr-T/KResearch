@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import LiquidButton from './LiquidButton';
 import Spinner from './Spinner';
@@ -46,8 +45,8 @@ const ClarificationChat: React.FC<ClarificationChatProps> = ({ history, onAnswer
 
     return (
         <div className="w-full animate-fade-in space-y-4">
-            <h2 className="text-xl font-bold text-center text-gray-800 dark:text-gray-200">Refining Your Request</h2>
-            <p className="text-sm text-center text-gray-600 dark:text-gray-400">To get the best results, the AI will ask a few clarifying questions.</p>
+            <h2 className="text-xl font-bold text-center text-gray-800 dark:text-gray-200">优化你的需求</h2>
+            <p className="text-sm text-center text-gray-600 dark:text-gray-400">为获得最佳结果，AI会向你提出一些澄清问题。</p>
             
             <div ref={chatContainerRef} className="max-h-80 overflow-y-auto space-y-4 p-4 rounded-lg bg-black/5 dark:bg-white/5 scroll-smooth">
                 {getVisibleHistory().map((turn, index) => (
@@ -65,7 +64,7 @@ const ClarificationChat: React.FC<ClarificationChatProps> = ({ history, onAnswer
                     <div className="flex justify-start animate-fade-in">
                          <div className="max-w-md p-3 rounded-xl bg-glass-light dark:bg-glass-dark flex items-center gap-2">
                             <Spinner />
-                            <span className="text-sm">Thinking...</span>
+                            <span className="text-sm">思考中...</span>
                          </div>
                     </div>
                 )}
@@ -76,7 +75,7 @@ const ClarificationChat: React.FC<ClarificationChatProps> = ({ history, onAnswer
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Your answer..."
+                    placeholder="你的回答..."
                     className="
                         w-full h-20 p-3 rounded-xl resize-none
                         bg-black/10 dark:bg-black/20 
@@ -89,7 +88,7 @@ const ClarificationChat: React.FC<ClarificationChatProps> = ({ history, onAnswer
                     aria-label="Your answer to the AI's question"
                 />
                 <LiquidButton type="submit" disabled={isLoading || !userAnswer.trim()} className="w-full">
-                    {isLoading ? 'Waiting...' : 'Send Answer'}
+                    {isLoading ? '等待中...' : '发送回答'}
                 </LiquidButton>
             </form>
         </div>

@@ -18,7 +18,8 @@ export const runDynamicConversationalPlanner = async (
     idCounter: { current: number },
     mode: ResearchMode,
     clarifiedContext: string,
-    fileData: FileData | null
+    fileData: FileData | null,
+    customModels?: { planner?: string }
 ): Promise<{ search_queries: string[], should_finish: boolean, finish_reason?: string }> => {
     const searchHistoryText = researchHistory.filter(h => h.type === 'search').map(h => (Array.isArray(h.content) ? h.content : [h.content]).join(', ')).join('; ');
     const readHistoryText = researchHistory.filter(h => h.type === 'read').map(h => h.content).join('\n---\n');
@@ -68,23 +69,21 @@ export const runDynamicConversationalPlanner = async (
         if (fileData) {
             parts.push({ inlineData: { mimeType: fileData.mimeType, data: fileData.data } });
         }
+        let modelName = customModels?.planner || researchModeModels[mode].planner;
         let response;
         if (PROVIDER === 'openai') {
-            // OpenAI 格式
             response = await aiClient.chat.completions.create({
-                model: researchModeModels[mode].planner,
+                model: modelName,
                 messages: [
                     { role: 'system', content: 'You are an AI research planner.' },
                     { role: 'user', content: prompt }
                 ],
                 temperature: 0.7
             });
-            // OpenAI 返回格式兼容
             response = { text: response.choices[0].message.content };
         } else {
-            // GoogleGenAI 格式
             response = await aiClient.models.generateContent({
-                model: researchModeModels[mode].planner,
+                model: modelName,
                 contents: { parts },
                 config: { responseMimeType: "application/json", temperature: 0.7 }
             });
